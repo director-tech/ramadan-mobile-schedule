@@ -31,6 +31,7 @@
 
         html {
             scroll-behavior: smooth;
+            overflow-x: hidden;
         }
 
         body {
@@ -39,6 +40,7 @@
             color: var(--charcoal);
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
         /* Main Content */
@@ -473,9 +475,9 @@
             font-size: 12px;
             color: var(--charcoal);
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 6px;
-            white-space: nowrap;
+            line-height: 1.4;
         }
 
         .location-note.hidden {
@@ -715,6 +717,17 @@
 
         .selection-screen.hidden {
             display: none;
+        }
+
+        /* No animation state (after first visit) */
+        .selection-screen.no-animate .selection-logos,
+        .selection-screen.no-animate .selection-welcome,
+        .selection-screen.no-animate .selection-title,
+        .selection-screen.no-animate .selection-subtitle,
+        .selection-screen.no-animate .selection-btn {
+            animation: none;
+            opacity: 1;
+            transform: none;
         }
 
         .selection-logos {
@@ -1339,7 +1352,10 @@
             // Hide kids section when going back
             document.getElementById('kidsSection').classList.add('hidden');
 
-            document.getElementById('selectionScreen').classList.remove('hidden');
+            // Show selection screen without animations (user has already seen it)
+            const selectionScreen = document.getElementById('selectionScreen');
+            selectionScreen.classList.add('no-animate');
+            selectionScreen.classList.remove('hidden');
         }
 
         function filterContent(category) {
@@ -1530,7 +1546,16 @@
 
         // Always show selection screen on page load (don't auto-restore from localStorage)
         document.addEventListener('DOMContentLoaded', () => {
-            // Selection screen is visible by default
+            // Check if user has visited before - if so, disable animations
+            const hasVisited = localStorage.getItem('hasVisitedWelcome');
+            if (hasVisited) {
+                document.getElementById('selectionScreen').classList.add('no-animate');
+            } else {
+                // Mark as visited after animations complete
+                setTimeout(() => {
+                    localStorage.setItem('hasVisitedWelcome', 'true');
+                }, 1500);
+            }
         });
 
         // Event date: February 7th, 2025 (Chicago time)
