@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ramadan Workshop Schedule - February 7th</title>
     <style>
-        @font-face { font-family: 'Signifier'; src: url('./Signifier-Regular.otf') format('opentype'); font-weight: 400; }
-        @font-face { font-family: 'Signifier'; src: url('./Signifier-Medium.otf') format('opentype'); font-weight: 500; }
-        @font-face { font-family: 'Signifier'; src: url('./Signifier-Light.otf') format('opentype'); font-weight: 300; }
-        @font-face { font-family: 'Matter'; src: url('./MatterRegular.otf') format('opentype'); font-weight: 400; }
-        @font-face { font-family: 'Matter'; src: url('./MatterMedium.otf') format('opentype'); font-weight: 500; }
-        @font-face { font-family: 'Matter'; src: url('./MatterSemiBold.otf') format('opentype'); font-weight: 600; }
-        @font-face { font-family: 'Matter'; src: url('./MatterLight.otf') format('opentype'); font-weight: 300; }
-        @font-face { font-family: 'Matter'; src: url('./MatterBold.otf') format('opentype'); font-weight: 700; }
+        @font-face { font-family: 'Signifier'; src: url('./Signifier-Regular.otf') format('opentype'); font-weight: 400; font-display: swap; }
+        @font-face { font-family: 'Signifier'; src: url('./Signifier-Medium.otf') format('opentype'); font-weight: 500; font-display: swap; }
+        @font-face { font-family: 'Signifier'; src: url('./Signifier-Light.otf') format('opentype'); font-weight: 300; font-display: swap; }
+        @font-face { font-family: 'Matter'; src: url('./MatterRegular.otf') format('opentype'); font-weight: 400; font-display: swap; }
+        @font-face { font-family: 'Matter'; src: url('./MatterMedium.otf') format('opentype'); font-weight: 500; font-display: swap; }
+        @font-face { font-family: 'Matter'; src: url('./MatterSemiBold.otf') format('opentype'); font-weight: 600; font-display: swap; }
+        @font-face { font-family: 'Matter'; src: url('./MatterLight.otf') format('opentype'); font-weight: 300; font-display: swap; }
+        @font-face { font-family: 'Matter'; src: url('./MatterBold.otf') format('opentype'); font-weight: 700; font-display: swap; }
 
         :root {
             --navy: #1a2744;
@@ -678,7 +678,8 @@
             align-items: center;
             justify-content: center;
             padding: 24px;
-            overflow: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .selection-screen::before {
@@ -1288,6 +1289,7 @@
 
         // Category Selection
         let currentCategory = null;
+        let shouldScrollToActive = false;
 
         function selectCategory(category) {
             currentCategory = category;
@@ -1316,6 +1318,9 @@
 
             // Filter content
             filterContent(category);
+
+            // Enable scroll-to-active for the initial highlight after selection
+            shouldScrollToActive = true;
 
             // Update highlight after filtering
             setTimeout(updateHighlight, 100);
@@ -1520,9 +1525,12 @@
             peekToggleText.textContent = isExpanded ? 'Hide' : originalPeekButtonText;
         }
 
-        // Always show selection screen first on page load
+        // Check for saved category on page load
         document.addEventListener('DOMContentLoaded', () => {
-            // Selection screen is visible by default, no auto-load
+            const savedCategory = localStorage.getItem('userCategory');
+            if (savedCategory) {
+                selectCategory(savedCategory);
+            }
         });
 
         // Event date: February 7th, 2025 (Chicago time)
@@ -1531,9 +1539,15 @@
 
         function getChicagoTime() {
             const now = new Date();
-            const chicagoTime = new Date(now.toLocaleString('en-US', { timeZone: CHICAGO_TZ }));
-            const hours = chicagoTime.getHours();
-            const minutes = chicagoTime.getMinutes();
+            // Use Intl to safely extract Chicago wall-clock time components
+            const options = { timeZone: 'America/Chicago', hour: 'numeric', minute: 'numeric', hour12: false };
+            const formatter = new Intl.DateTimeFormat('en-US', options);
+            const parts = formatter.formatToParts(now);
+
+            // Parse integers safely
+            const hours = parseInt(parts.find(p => p.type === 'hour').value, 10);
+            const minutes = parseInt(parts.find(p => p.type === 'minute').value, 10);
+
             return { hours, minutes, totalMinutes: hours * 60 + minutes };
         }
 
@@ -1543,11 +1557,29 @@
         }
 
         function updateHighlight() {
-            const { totalMinutes } = getChicagoTime();
+            // Check if today is actually the event date (Feb 7th, 2025)
+            const now = new Date();
+            const dateFormatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'America/Chicago',
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+            });
+            const dateParts = dateFormatter.formatToParts(now);
+            const month = dateParts.find(p => p.type === 'month').value;
+            const day = dateParts.find(p => p.type === 'day').value;
+            const year = dateParts.find(p => p.type === 'year').value;
 
-            // Remove all existing highlights and badges
+            // Remove all existing highlights and badges first
             document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.now-badge').forEach(el => el.remove());
+
+            // Event is Feb 7, 2025. Stop highlighting if it's not the day.
+            if (month != '2' || day != '7' || year != '2025') {
+                return;
+            }
+
+            const { totalMinutes } = getChicagoTime();
 
             // Find all timed elements
             const timedElements = document.querySelectorAll('[data-start][data-end]');
@@ -1562,10 +1594,11 @@
                     const parentTrack = el.closest('.track');
                     const isHidden = parentTrack && parentTrack.classList.contains('hidden');
 
-                    // Also check if inside peek container (cloned content)
+                    // Check if inside peek container (cloned content)
                     const inPeekContainer = el.closest('.peek-container');
 
-                    if (!isHidden && !inPeekContainer) {
+                    // Allow highlighting if not hidden (including peek container items)
+                    if (!isHidden) {
                         el.classList.add('active');
 
                         // Add "NOW" badge
@@ -1577,26 +1610,27 @@
                             timeEl.appendChild(badge);
                         }
 
-                        if (!activeElement) {
+                        // Only set activeElement for main content (not peek), for scroll purposes
+                        if (!activeElement && !inPeekContainer) {
                             activeElement = el;
                         }
                     }
                 }
             });
 
-            // Scroll to active element
-            if (activeElement) {
+            // Only scroll to active element on first load after category selection
+            if (activeElement && shouldScrollToActive) {
                 setTimeout(() => {
                     activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 300);
+                shouldScrollToActive = false; // Only scroll once
             }
         }
 
-        // Run on page load
+        // Run highlight updates every minute (but don't auto-scroll)
         document.addEventListener('DOMContentLoaded', () => {
-            updateHighlight();
-
-            // Update every minute
+            // Don't run updateHighlight on initial load - wait for category selection
+            // Update every minute (just highlights, no scroll)
             setInterval(updateHighlight, 60000);
         });
     </script>
