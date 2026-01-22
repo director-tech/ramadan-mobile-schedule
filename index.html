@@ -603,17 +603,17 @@
         /* Scroll to top button */
         .scroll-top {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 48px;
-            height: 48px;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
             background: var(--navy);
             color: white;
             border: none;
             border-radius: 50%;
-            font-size: 20px;
+            font-size: 16px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(26, 39, 68, 0.4);
+            box-shadow: 0 3px 10px rgba(26, 39, 68, 0.4);
             display: none;
             align-items: center;
             justify-content: center;
@@ -678,6 +678,7 @@
             align-items: center;
             justify-content: center;
             padding: 24px;
+            overflow-x: hidden;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -1525,12 +1526,9 @@
             peekToggleText.textContent = isExpanded ? 'Hide' : originalPeekButtonText;
         }
 
-        // Check for saved category on page load
+        // Always show selection screen on page load (don't auto-restore from localStorage)
         document.addEventListener('DOMContentLoaded', () => {
-            const savedCategory = localStorage.getItem('userCategory');
-            if (savedCategory) {
-                selectCategory(savedCategory);
-            }
+            // Selection screen is visible by default
         });
 
         // Event date: February 7th, 2025 (Chicago time)
