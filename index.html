@@ -1311,6 +1311,9 @@
             currentCategory = category;
             localStorage.setItem('userCategory', category);
 
+            // Push state to history so back button returns to selection
+            history.pushState({ page: 'schedule', category: category }, '', '#schedule');
+
             // Hide selection screen
             document.getElementById('selectionScreen').classList.add('hidden');
 
@@ -1555,6 +1558,16 @@
                 setTimeout(() => {
                     localStorage.setItem('hasVisitedWelcome', 'true');
                 }, 1500);
+            }
+
+            // Set initial history state for selection screen
+            history.replaceState({ page: 'selection' }, '', window.location.pathname);
+        });
+
+        // Handle browser back button - return to selection screen
+        window.addEventListener('popstate', (event) => {
+            if (!event.state || event.state.page === 'selection') {
+                showSelection();
             }
         });
 
