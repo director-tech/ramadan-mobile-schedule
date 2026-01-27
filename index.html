@@ -1187,20 +1187,20 @@
                         <p class="track-item-time">4:00 – 4:30 PM</p>
                         <p class="track-item-topic">Welcome & Ice Breaker</p>
                     </div>
-                    <div class="track-item" data-start="16:30" data-end="17:30">
-                        <p class="track-item-time">4:30 – 5:30 PM</p>
+                    <div class="track-item" data-start="16:30" data-end="17:00">
+                        <p class="track-item-time">4:30 – 5:00 PM</p>
                         <p class="track-item-topic">Storytime with the Author</p>
                     </div>
-                    <div class="track-item" data-start="17:30" data-end="18:00">
-                        <p class="track-item-time">5:30 – 6:00 PM</p>
-                        <p class="track-item-topic">Pizza Break!</p>
+                    <div class="track-item" data-start="17:00" data-end="17:30">
+                        <p class="track-item-time">5:00 – 5:30 PM</p>
+                        <p class="track-item-topic">Maghreb Salah Break</p>
                     </div>
-                    <div class="track-item" data-start="18:00" data-end="19:00">
-                        <p class="track-item-time">6:00 – 7:00 PM</p>
+                    <div class="track-item" data-start="17:30" data-end="18:30">
+                        <p class="track-item-time">5:30 – 6:30 PM</p>
                         <p class="track-item-topic">Ramadan Arts & Crafts</p>
                     </div>
-                    <div class="track-item" data-start="19:00" data-end="19:50">
-                        <p class="track-item-time">7:00 – 7:50 PM</p>
+                    <div class="track-item" data-start="18:30" data-end="20:00">
+                        <p class="track-item-time">6:30 PM – Isha</p>
                         <p class="track-item-topic">Movement & Playtime</p>
                     </div>
                 </div>
@@ -1737,8 +1737,8 @@
             }
         });
 
-        // Event date: February 7th, 2025 (Chicago time)
-        const EVENT_DATE = '2025-02-07';
+        // Event date: February 7th, 2026 (Chicago time)
+        const EVENT_DATE = '2026-02-07';
         const CHICAGO_TZ = 'America/Chicago';
 
         function getChicagoTime() {
@@ -1761,7 +1761,7 @@
         }
 
         function updateHighlight() {
-            // Check if today is actually the event date (Feb 7th, 2025)
+            // Check if today is actually the event date (Feb 7th, 2026)
             const now = new Date();
             const dateFormatter = new Intl.DateTimeFormat('en-US', {
                 timeZone: 'America/Chicago',
@@ -1778,8 +1778,8 @@
             document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.now-badge').forEach(el => el.remove());
 
-            // Event is Feb 7, 2025. Stop highlighting if it's not the day.
-            if (month != '2' || day != '7' || year != '2025') {
+            // Event is Feb 7, 2026. Stop highlighting if it's not the day.
+            if (month != '2' || day != '7' || year != '2026') {
                 return;
             }
 
